@@ -20,3 +20,7 @@ const force = false //Used to wipe db on start
 sequelize.sync({force}).then(() => {
   console.log('Db and tables created')
 })
+
+module.exports = {
+  
+}
