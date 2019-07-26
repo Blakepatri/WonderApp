@@ -84,19 +84,27 @@ sequelize.sync({force}).then(() => {
   console.log('Db and tables created')
 })
 
-const orderTransaction = async (order) => {
-  const xResult = await PartXinc.findAll()
-  let yResult = await PartYinc.findAll()
-  let zResult = await PartZinc.findAll()
+const orderTransaction = async (company, order) => {
+  let Inventory, Part, StockLevel, Warehouse
+  if (company === 'xinc') {
+    Inventory = InventoryModel(xinc, Sequelize)
+    Part = PartModel(xinc, Sequelize)
+    StockLevel = StockLevelModel(xinc, Sequelize)
+    Warehouse = WarehouseModel(xinc, Sequelize)
+  } else if (company === 'yinc') {
+    Inventory = InventoryModel(yinc, Sequelize)
+    Part = PartModel(yinc, Sequelize)
+    StockLevel = StockLevelModel(yinc, Sequelize)
+    Warehouse = WarehouseModel(yinc, Sequelize)
+  } else if (company === 'zinc') {
+    Inventory = InventoryModel(zinc, Sequelize)
+    Part = PartModel(zinc, Sequelize)
+    StockLevel = StockLevelModel(zinc, Sequelize)
+    Warehouse = WarehouseModel(zinc, Sequelize)
+  }
+  const result = await Part.findAll()
 
-  return {xResult, yResult, zResult}
-  /*return sequelize.transaction().then((t) => {
-    const ids = []
-    for (let i = 0; i < order.parts.length; i++) {
-      ids.push(order.parts[i].partNumber) 
-    }
-    return Part
-  })*/
+  return result
 }
 
 module.exports = {

@@ -26,11 +26,12 @@ app.listen(8000, () => {
 
 app.route('/api/order').post(async (req, res) => {
   try {
+    const company = process.argv[2]
     // const order = req.body
     // if (!order.orderNumber || !order.companyName || !order.numberOfParts || order.parts.length === 0) {
     //   res.json({status: 'fail'})
     // } else {
-     const result = await sequelize.orderTransaction('')
+     const result = await sequelize.orderTransaction(company, '')
      res.json({status: 'success', result})
    // }
   } catch (err) {
