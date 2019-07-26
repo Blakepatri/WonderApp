@@ -23,3 +23,17 @@ app.use(cors(corsOptions))
 app.listen(8000, () => {
   console.log('Server started!')
 })
+
+app.route('/api/order').post(async (req, res) => {
+  try {
+    // const order = req.body
+    // if (!order.orderNumber || !order.companyName || !order.numberOfParts || order.parts.length === 0) {
+    //   res.json({status: 'fail'})
+    // } else {
+     const result = await sequelize.orderTransaction('')
+     res.json({status: 'success', result})
+   // }
+  } catch (err) {
+    console.log(err)
+  }
+})
