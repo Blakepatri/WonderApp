@@ -1,4 +1,8 @@
 const Sequelize = require('sequelize')
+const InventoryModel = require('./models/inventory')
+const PartModel = require('./models/part')
+const StockLevelModel = require('./models/stock_level')
+const WarehouseModel = require('./models/warehouse')
 
 const sequelize = new Sequelize('store', 'root', 'password', {
   host: 'localhost',
@@ -80,6 +84,21 @@ sequelize.sync({force}).then(() => {
   console.log('Db and tables created')
 })
 
+const orderTransaction = async (order) => {
+  const xResult = await PartXinc.findAll()
+  let yResult = await PartYinc.findAll()
+  let zResult = await PartZinc.findAll()
+
+  return {xResult, yResult, zResult}
+  /*return sequelize.transaction().then((t) => {
+    const ids = []
+    for (let i = 0; i < order.parts.length; i++) {
+      ids.push(order.parts[i].partNumber) 
+    }
+    return Part
+  })*/
+}
+
 module.exports = {
-  
+  orderTransaction
 }
