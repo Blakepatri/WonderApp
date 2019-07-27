@@ -21,27 +21,35 @@ app.use(bodyParser.json())
 app.use(cors(corsOptions))
 
 app.listen(process.argv[2] === 'xinc' ? 8000 : process.argv[2] === 'yinc' ? 8001 : process.argv[2] === 'zinc' ? 8002 : 8000 , () => {
-  console.log('Server started!', )
+  console.log(process.argv[2] === 'xinc' ? 8000 : process.argv[2] === 'yinc' ? 8001 : process.argv[2] === 'zinc' ? 8002 : 8000)
+  console.log('Server started!')
 })
 
 app.route('/api/order').post(async (req, res) => {
   try {
     console.log(req.body)
     const company = process.argv[2]
-    // const order = req.body
-    // if (!order.orderNumber || !order.companyName || !order.numberOfParts || order.parts.length === 0) {
-    //   res.json({status: 'fail'})
-    // } else {
-     const result = await sequelize.orderTransaction(company, req.body)
-     if (result) {
-       res.json({status: 'success', result})
-     } else {
-       res.json({status: 'fail'})
-     }
-   // }
+    const order = req.body
+    const parts = []
+    if (!order.orderNumber || !order.companyName || !order.numberOfParts || order.parts.length === 0) {
+      res.json({status: 'fail'})
+    } else { 
+      for (let i = 0; i < order.parts.length; i++) {
+        if (order.parts[i].companyName.toLowerCase() === company) {
+          parts.push(order.parts[i])
+        }
+      }
+      if (parts.length > 0) {
+        const result = await sequelize.orderTransaction(company, parts, order.orderNumber)
+        if (result) {
+          res.json({status: 'success', result})
+        } else {
+          res.json({status: 'fail'})
+        }
+      }
+    }
   } catch (err) {
     res.json({status: 'fail'})
-    console.log(err)
   }
 })
 
@@ -51,6 +59,14 @@ app.route('/api/commit').post(async (req, res) => {
     res.json({status: 'success'})
   } catch (err) {
     res.json({status: 'fail'})
-    console.log(err)
+  }
+})
+
+app.route('/api/rollback').post(async (req, res) => {
+  try {
+    await sequelize.rollbackTransaction(req.body.xid)
+    res.json({status: 'success'})
+  } catch (err) {
+    res.json({status: 'fail'})
   }
 })
