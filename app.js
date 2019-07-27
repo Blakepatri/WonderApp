@@ -16,9 +16,9 @@ const corsOptions = {
   origin: 'http://localhost:4200',
   optionsSuccessStatus: 200
 }
+app.use(cors(corsOptions))
 
 app.use(bodyParser.json())
-app.use(cors(corsOptions))
 
 app.listen(process.argv[2] === 'xinc' ? 8000 : process.argv[2] === 'yinc' ? 8001 : process.argv[2] === 'zinc' ? 8002 : 8000 , () => {
   console.log(process.argv[2] === 'xinc' ? 8000 : process.argv[2] === 'yinc' ? 8001 : process.argv[2] === 'zinc' ? 8002 : 8000)
@@ -46,6 +46,8 @@ app.route('/api/order').post(async (req, res) => {
         } else {
           res.json({status: 'fail'})
         }
+      } else {
+        res.json({status: 'success'})
       }
     }
   } catch (err) {
