@@ -79,34 +79,42 @@ const StockLevelZinc = StockLevelModel(zinc, Sequelize)
 const WarehouseZinc = WarehouseModel(zinc, Sequelize)
 
 const force = false //Used to wipe db on start
+let db
 
 sequelize.sync({force}).then(() => {
   console.log('Db and tables created')
 })
 
 const orderTransaction = async (company, order) => {
-  let Inventory, Part, StockLevel, Warehouse
-  if (company === 'xinc') {
-    Inventory = InventoryModel(xinc, Sequelize)
-    Part = PartModel(xinc, Sequelize)
-    StockLevel = StockLevelModel(xinc, Sequelize)
-    Warehouse = WarehouseModel(xinc, Sequelize)
-  } else if (company === 'yinc') {
-    Inventory = InventoryModel(yinc, Sequelize)
-    Part = PartModel(yinc, Sequelize)
-    StockLevel = StockLevelModel(yinc, Sequelize)
-    Warehouse = WarehouseModel(yinc, Sequelize)
-  } else if (company === 'zinc') {
-    Inventory = InventoryModel(zinc, Sequelize)
-    Part = PartModel(zinc, Sequelize)
-    StockLevel = StockLevelModel(zinc, Sequelize)
-    Warehouse = WarehouseModel(zinc, Sequelize)
-  }
-  const result = await Part.findAll()
+  let xid
+  try {
+    if (company === 'xinc') db = xinc
+    else if (company === 'yinc') db = yinc
+    else if (company === 'zinc') db = zinc
 
-  return result
+    const Inventory = InventoryModel(db, Sequelize)
+    const Part = PartModel(db, Sequelize)
+    const StockLevel = StockLevelModel(db, Sequelize)
+    const Warehouse = WarehouseModel(db, Sequelize)
+
+    xid = company + order.orderNumber + Math.floor((Math.random() * 10000) + 1)
+    await db.query(`XA START "${xid}"`)
+    // Placeholder, should have our transaction happen here
+    await Part.create({par_id: 'ISO-ggg', par_name: 'D', par_weight: 2})
+    await db.query(`XA END "${xid}"`)
+    await db.query(`XA PREPARE "${xid}"`)
+    return xid
+  } catch (err) {
+    await db.query(`XA ROLLBACK "${xid}"`)
+    return err
+  }
+}
+
+const commitTransaction = async (xid) => {
+  db.query(`XA COMMIT "${xid}"`)
 }
 
 module.exports = {
-  orderTransaction
+  orderTransaction,
+  commitTransaction
 }
