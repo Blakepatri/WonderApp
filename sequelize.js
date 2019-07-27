@@ -4,7 +4,7 @@ const PartModel = require('./models/part')
 const StockLevelModel = require('./models/stock_level')
 const WarehouseModel = require('./models/warehouse')
 
-const sequelize = new Sequelize('store', 'root', 'password', {
+const sequelize = new Sequelize('sharkinc', 'root', 'password', {
   host: 'localhost',
   dialect: 'mysql',
   pool: {
