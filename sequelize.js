@@ -100,7 +100,7 @@ const orderTransaction = async (company, order) => {
     xid = company + order.orderNumber + Math.floor((Math.random() * 10000) + 1)
     await db.query(`XA START "${xid}"`)
     // Placeholder, should have our transaction happen here
-    await Part.create({par_id: 'ISO-fff', par_name: 'D', par_weight: 2})
+    await Part.create({par_id: 'ISO-ggg', par_name: 'D', par_weight: 2})
     await db.query(`XA END "${xid}"`)
     await db.query(`XA PREPARE "${xid}"`)
     return xid
