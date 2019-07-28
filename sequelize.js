@@ -4,7 +4,7 @@ const PartModel = require('./models/part')
 const StockLevelModel = require('./models/stock_level')
 const WarehouseModel = require('./models/warehouse')
 
-const sequelize = new Sequelize('sharkinc', 'root', 'password', {
+const sequelize = new Sequelize('sharkinc', 'root', 'Password1!', {
   host: 'localhost',
   dialect: 'mysql',
   pool: {
@@ -19,7 +19,7 @@ const sequelize = new Sequelize('sharkinc', 'root', 'password', {
   },
 })
 
-const xinc = new Sequelize('xinc', 'xinc', 'password', {
+const xinc = new Sequelize('xinc', 'xinc', 'Password1!', {
   host: 'localhost',
   dialect: 'mysql',
   pool: {
@@ -34,7 +34,7 @@ const xinc = new Sequelize('xinc', 'xinc', 'password', {
   },
 })
 
-const yinc = new Sequelize('yinc', 'yinc', 'password', {
+const yinc = new Sequelize('yinc', 'yinc', 'Password1!', {
   host: 'localhost',
   dialect: 'mysql',
   pool: {
@@ -49,7 +49,7 @@ const yinc = new Sequelize('yinc', 'yinc', 'password', {
   },
 })
 
-const zinc = new Sequelize('zinc', 'zinc', 'password', {
+const zinc = new Sequelize('zinc', 'zinc', 'Password1!', {
   host: 'localhost',
   dialect: 'mysql',
   pool: {
@@ -80,13 +80,13 @@ const WarehouseZinc = WarehouseModel(zinc, Sequelize)
 
 const force = false //Used to wipe db on start
 let db
+let xid
 
 sequelize.sync({force}).then(() => {
   console.log('Db and tables created')
 })
 
 const orderTransaction = async (company, order, orderNumber) => {
-  let xid
   try {
     if (company === 'xinc') db = xinc
     else if (company === 'yinc') db = yinc
@@ -155,11 +155,12 @@ const orderTransaction = async (company, order, orderNumber) => {
   }
 }
 
-const commitTransaction = async (xid) => {
+const commitTransaction = async () => {
+  console.log('commit', xid)
   await db.query(`XA COMMIT "${xid}"`)
 }
 
-const rollbackTransaction = async (xid) => {
+const rollbackTransaction = async () => {
   await db.query(`XA ROLLBACK "${xid}"`)
 }
 
