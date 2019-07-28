@@ -13,7 +13,7 @@ const con = mysql.createConnection({
 
 const app = express()
 const corsOptions = {
-  origin: 'http://localhost:4200',
+  origin: 'http://localhost',
   optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions))
@@ -27,7 +27,6 @@ app.listen(process.argv[2] === 'xinc' ? 8000 : process.argv[2] === 'yinc' ? 8001
 
 app.route('/api/order').post(async (req, res) => {
   try {
-    console.log(req.body)
     const company = process.argv[2]
     const order = req.body
     const parts = []
@@ -42,33 +41,42 @@ app.route('/api/order').post(async (req, res) => {
       if (parts.length > 0) {
         const result = await sequelize.orderTransaction(company, parts, order.orderNumber)
         if (result) {
+          res.status(200)
           res.json({status: 'success', result})
         } else {
+          res.status(400)
           res.json({status: 'fail'})
         }
       } else {
+        res.status(200)
         res.json({status: 'success'})
       }
     }
   } catch (err) {
+    console.log('err', err)
+    res.status(400)
     res.json({status: 'fail'})
   }
 })
 
 app.route('/api/commit').post(async (req, res) => {
   try {
-    await sequelize.commitTransaction(req.body.xid)
+    await sequelize.commitTransaction()
+    res.status(200)
     res.json({status: 'success'})
   } catch (err) {
+    res.status(400)
     res.json({status: 'fail'})
   }
 })
 
 app.route('/api/rollback').post(async (req, res) => {
   try {
-    await sequelize.rollbackTransaction(req.body.xid)
+    await sequelize.rollbackTransaction()
+    res.status(200)
     res.json({status: 'success'})
   } catch (err) {
+    res.status(400)
     res.json({status: 'fail'})
   }
 })
